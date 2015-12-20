@@ -4,18 +4,61 @@ output:
   html_document:
     keep_md: true
 ---
+#Summary
+
+This is the markdown document for Reproducible Research Course at Coursera for participant Sami Ahma-aho.
+Github:
+https://github.com/samfield/RepData_PeerAssessment1.git
 
 
 ## Loading and preprocessing the data
+
+I will use some basic packages for plotting and data handling, the following loads those packages:
+```{r load, echo=TRUE}
+require(data.table)
+require(dplyr)
+require(ggplot2)
+```
+
+It is assumed that the working directory of the user contains the same package of data as in the original repository, namely the activity.zip.
+
+First we will load the data. By using the unzip command
+```{r unzip,}
+#directories;
+#define the where the zip file is downloaded
+temp <- paste(getwd(), "activity.zip", sep = "/")
+#unzip the loaded file to the working directory then load a data.table with fread function
+dt <- fread(unzip(temp), verbose = TRUE)
+#turn date as a date variable
+dt[,date:=as.Date(date, "%Y-%m-%d")]
+#turn steps to numeric
+dt[,steps:=as.numeric(steps)]
+#the summary for our data is 
+summary(dt)
+```
 
 
 
 ## What is mean total number of steps taken per day?
 
+```{r question_1, echo=FALSE}
+#calculation of mean of steps per day, removing na values, but reporting whole days with no values
+dt[,.(mean_steps=mean(steps, na.rm = TRUE)), by=date]
+#calculation of mean of steps per day, removing na values, but reporting whole days with no values
+dt[,.(median_steps=median(steps, na.rm = TRUE)), by=date]
+#plotting total number of steps daily
+#the data is a steps by dates
+ggplot(data=dt[is.na(steps)==FALSE,.(sum_of_steps=sum(steps, na.rm = TRUE)), by=date], aes(sum_of_steps)) + geom_histogram() +xlab("Number of steps") +ylab("Frequency of days") +ggtitle("Histogram of sum of steps by day")
+```
+
 
 
 ## What is the average daily activity pattern?
 
+```{r average_plot, echo=TRUE}
+#make the plot of average daily activity
+ggplot(data=dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)), by=.(date,interval)],aes(x=interval,y=average)) + geom_line() +ggtitle("Average daily pattern")
+```
 
 
 ## Imputing missing values
