@@ -58,10 +58,17 @@ ggplot(data=dt[is.na(steps)==FALSE,.(sum_of_steps=sum(steps, na.rm = TRUE)), by=
 ```{r average_plot, echo=TRUE}
 #make the plot of average daily activity
 ggplot(data=dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)), by=.(date,interval)],aes(x=interval,y=average)) + geom_line() +ggtitle("Average daily pattern")
+#maximum steps averaged over days(of interval)
+dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)),by=.(date,interval)][,max(average)]
+#the date of maximum amount of steps
+dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)),by=.(date,interval)][max(average),date]
 ```
 
 
 ## Imputing missing values
+```{r totat_amount_na, echo=FALSE}
+
+```
 
 
 
