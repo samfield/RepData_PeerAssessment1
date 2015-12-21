@@ -289,7 +289,39 @@ dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)),by=.(date,interval)]
 
 ## Imputing missing values
 
+```
+## [1] 2304
+```
 
+```
+## [1] 0
+```
+
+```
+## [1] 0
+```
+Total of 2304 missing values.
+
+
+```r
+#create a new dataset
+#impute mean steps by mean of day
+dt_impute <- dt
+dt_impute[is.na(steps)==TRUE,steps:=mean(dt$steps, na.rm = TRUE)]
+```
+
+
+```r
+ggplot(data=dt_impute[is.na(steps)==FALSE,.(sum_of_steps=sum(steps, na.rm = TRUE)), by=date], aes(sum_of_steps)) + geom_histogram() +xlab("Number of steps") +ylab("Frequency of days") +ggtitle("Histogram of sum of steps by day")
+```
+
+```
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+```
+
+![](PA1_template_files/figure-html/new_hist-1.png) 
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+OMITTED
