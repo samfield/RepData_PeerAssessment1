@@ -48,9 +48,18 @@ require(ggplot2)
 ## Loading required package: ggplot2
 ```
 
+```r
+require(lattice)
+```
+
+```
+## Loading required package: lattice
+```
+
 It is assumed that the working directory of the user contains the same package of data as in the original repository, namely the activity.zip.
 
 First we will load the data. By using the unzip command
+
 
 ```r
 #directories;
@@ -83,14 +92,14 @@ dt <- fread(unzip(temp), verbose = TRUE)
 ## Read 17568 rows. Exactly what was estimated and allocated up front
 ##    0.000s (  0%) Memory map (rerun may be quicker)
 ##    0.000s (  0%) sep and header detection
-##    0.000s (  0%) Count rows (wc -l)
+##    0.001s ( 17%) Count rows (wc -l)
 ##    0.000s (  0%) Column type detection (first, middle and last 5 rows)
 ##    0.000s (  0%) Allocation of 17568x3 result (xMB) in RAM
-##    0.000s (  0%) Reading data
+##    0.005s ( 83%) Reading data
 ##    0.000s (  0%) Allocation for type bumps (if any), including gc time if triggered
 ##    0.000s (  0%) Coercing data already read in type bumps (if any)
 ##    0.000s (  0%) Changing na.strings to NA
-##    0.001s        Total
+##    0.006s        Total
 ```
 
 ```r
@@ -113,215 +122,286 @@ summary(dt)
 ##  NA's   :2304
 ```
 
-
-
 ## What is mean total number of steps taken per day?
 
+__Sum of steps per day__
 
-```
-##           date mean_steps
-##  1: 2012-10-01        NaN
-##  2: 2012-10-02  0.4375000
-##  3: 2012-10-03 39.4166667
-##  4: 2012-10-04 42.0694444
-##  5: 2012-10-05 46.1597222
-##  6: 2012-10-06 53.5416667
-##  7: 2012-10-07 38.2465278
-##  8: 2012-10-08        NaN
-##  9: 2012-10-09 44.4826389
-## 10: 2012-10-10 34.3750000
-## 11: 2012-10-11 35.7777778
-## 12: 2012-10-12 60.3541667
-## 13: 2012-10-13 43.1458333
-## 14: 2012-10-14 52.4236111
-## 15: 2012-10-15 35.2048611
-## 16: 2012-10-16 52.3750000
-## 17: 2012-10-17 46.7083333
-## 18: 2012-10-18 34.9166667
-## 19: 2012-10-19 41.0729167
-## 20: 2012-10-20 36.0937500
-## 21: 2012-10-21 30.6284722
-## 22: 2012-10-22 46.7361111
-## 23: 2012-10-23 30.9652778
-## 24: 2012-10-24 29.0104167
-## 25: 2012-10-25  8.6527778
-## 26: 2012-10-26 23.5347222
-## 27: 2012-10-27 35.1354167
-## 28: 2012-10-28 39.7847222
-## 29: 2012-10-29 17.4236111
-## 30: 2012-10-30 34.0937500
-## 31: 2012-10-31 53.5208333
-## 32: 2012-11-01        NaN
-## 33: 2012-11-02 36.8055556
-## 34: 2012-11-03 36.7048611
-## 35: 2012-11-04        NaN
-## 36: 2012-11-05 36.2465278
-## 37: 2012-11-06 28.9375000
-## 38: 2012-11-07 44.7326389
-## 39: 2012-11-08 11.1770833
-## 40: 2012-11-09        NaN
-## 41: 2012-11-10        NaN
-## 42: 2012-11-11 43.7777778
-## 43: 2012-11-12 37.3784722
-## 44: 2012-11-13 25.4722222
-## 45: 2012-11-14        NaN
-## 46: 2012-11-15  0.1423611
-## 47: 2012-11-16 18.8923611
-## 48: 2012-11-17 49.7881944
-## 49: 2012-11-18 52.4652778
-## 50: 2012-11-19 30.6979167
-## 51: 2012-11-20 15.5277778
-## 52: 2012-11-21 44.3993056
-## 53: 2012-11-22 70.9270833
-## 54: 2012-11-23 73.5902778
-## 55: 2012-11-24 50.2708333
-## 56: 2012-11-25 41.0902778
-## 57: 2012-11-26 38.7569444
-## 58: 2012-11-27 47.3819444
-## 59: 2012-11-28 35.3576389
-## 60: 2012-11-29 24.4687500
-## 61: 2012-11-30        NaN
-##           date mean_steps
+
+```r
+#calculation of sum of steps per day, removing na values, but reporting whole days with no values
+dt[,.(sum_steps=sum(steps, na.rm = TRUE)), by=date]
 ```
 
 ```
-##           date median_steps
-##  1: 2012-10-01           NA
-##  2: 2012-10-02            0
-##  3: 2012-10-03            0
-##  4: 2012-10-04            0
-##  5: 2012-10-05            0
-##  6: 2012-10-06            0
-##  7: 2012-10-07            0
-##  8: 2012-10-08           NA
-##  9: 2012-10-09            0
-## 10: 2012-10-10            0
-## 11: 2012-10-11            0
-## 12: 2012-10-12            0
-## 13: 2012-10-13            0
-## 14: 2012-10-14            0
-## 15: 2012-10-15            0
-## 16: 2012-10-16            0
-## 17: 2012-10-17            0
-## 18: 2012-10-18            0
-## 19: 2012-10-19            0
-## 20: 2012-10-20            0
-## 21: 2012-10-21            0
-## 22: 2012-10-22            0
-## 23: 2012-10-23            0
-## 24: 2012-10-24            0
-## 25: 2012-10-25            0
-## 26: 2012-10-26            0
-## 27: 2012-10-27            0
-## 28: 2012-10-28            0
-## 29: 2012-10-29            0
-## 30: 2012-10-30            0
-## 31: 2012-10-31            0
-## 32: 2012-11-01           NA
-## 33: 2012-11-02            0
-## 34: 2012-11-03            0
-## 35: 2012-11-04           NA
-## 36: 2012-11-05            0
-## 37: 2012-11-06            0
-## 38: 2012-11-07            0
-## 39: 2012-11-08            0
-## 40: 2012-11-09           NA
-## 41: 2012-11-10           NA
-## 42: 2012-11-11            0
-## 43: 2012-11-12            0
-## 44: 2012-11-13            0
-## 45: 2012-11-14           NA
-## 46: 2012-11-15            0
-## 47: 2012-11-16            0
-## 48: 2012-11-17            0
-## 49: 2012-11-18            0
-## 50: 2012-11-19            0
-## 51: 2012-11-20            0
-## 52: 2012-11-21            0
-## 53: 2012-11-22            0
-## 54: 2012-11-23            0
-## 55: 2012-11-24            0
-## 56: 2012-11-25            0
-## 57: 2012-11-26            0
-## 58: 2012-11-27            0
-## 59: 2012-11-28            0
-## 60: 2012-11-29            0
-## 61: 2012-11-30           NA
-##           date median_steps
+##           date sum_steps
+##  1: 2012-10-01         0
+##  2: 2012-10-02       126
+##  3: 2012-10-03     11352
+##  4: 2012-10-04     12116
+##  5: 2012-10-05     13294
+##  6: 2012-10-06     15420
+##  7: 2012-10-07     11015
+##  8: 2012-10-08         0
+##  9: 2012-10-09     12811
+## 10: 2012-10-10      9900
+## 11: 2012-10-11     10304
+## 12: 2012-10-12     17382
+## 13: 2012-10-13     12426
+## 14: 2012-10-14     15098
+## 15: 2012-10-15     10139
+## 16: 2012-10-16     15084
+## 17: 2012-10-17     13452
+## 18: 2012-10-18     10056
+## 19: 2012-10-19     11829
+## 20: 2012-10-20     10395
+## 21: 2012-10-21      8821
+## 22: 2012-10-22     13460
+## 23: 2012-10-23      8918
+## 24: 2012-10-24      8355
+## 25: 2012-10-25      2492
+## 26: 2012-10-26      6778
+## 27: 2012-10-27     10119
+## 28: 2012-10-28     11458
+## 29: 2012-10-29      5018
+## 30: 2012-10-30      9819
+## 31: 2012-10-31     15414
+## 32: 2012-11-01         0
+## 33: 2012-11-02     10600
+## 34: 2012-11-03     10571
+## 35: 2012-11-04         0
+## 36: 2012-11-05     10439
+## 37: 2012-11-06      8334
+## 38: 2012-11-07     12883
+## 39: 2012-11-08      3219
+## 40: 2012-11-09         0
+## 41: 2012-11-10         0
+## 42: 2012-11-11     12608
+## 43: 2012-11-12     10765
+## 44: 2012-11-13      7336
+## 45: 2012-11-14         0
+## 46: 2012-11-15        41
+## 47: 2012-11-16      5441
+## 48: 2012-11-17     14339
+## 49: 2012-11-18     15110
+## 50: 2012-11-19      8841
+## 51: 2012-11-20      4472
+## 52: 2012-11-21     12787
+## 53: 2012-11-22     20427
+## 54: 2012-11-23     21194
+## 55: 2012-11-24     14478
+## 56: 2012-11-25     11834
+## 57: 2012-11-26     11162
+## 58: 2012-11-27     13646
+## 59: 2012-11-28     10183
+## 60: 2012-11-29      7047
+## 61: 2012-11-30         0
+##           date sum_steps
+```
+
+__Total number of steps daily__
+
+
+```r
+#plotting total number of steps daily
+#the data is a steps by dates
+ggplot(data=dt[is.na(steps)==FALSE,.(sum_of_steps=sum(steps, na.rm = TRUE)), by=date], aes(sum_of_steps)) + geom_histogram() +xlab("Number of steps") +ylab("Frequency of days") +ggtitle("Histogram of sum of steps by day")
 ```
 
 ```
-## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 ```
 
-![](PA1_template_files/figure-html/question_1-1.png) 
+![](PA1_template_files/figure-html/histogram_daily-1.png) 
 
+__Mean and median steps for total steps per day__
+
+
+```r
+#calculation of mean of steps for total sum of steps per day
+dt[,.(sum_steps=sum(steps, na.rm = TRUE)), by=date][,.(steps_mean=mean(sum_steps, na.rm = TRUE))]
+```
+
+```
+##    steps_mean
+## 1:    9354.23
+```
+
+```r
+#calculation of median of steps per day
+dt[,.(sum_steps=sum(steps, na.rm = TRUE)), by=date][,.(steps_median=median(sum_steps, na.rm = TRUE))]
+```
+
+```
+##    steps_median
+## 1:        10395
+```
 
 
 ## What is the average daily activity pattern?
 
+__Time series of average daily activity__
+
 
 ```r
 #make the plot of average daily activity
-ggplot(data=dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)), by=.(date,interval)],aes(x=interval,y=average)) + geom_line() +ggtitle("Average daily pattern")
+ggplot(data=dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)), by=.(interval)],aes(x=interval,y=average)) + geom_line() +ggtitle("Average daily pattern")
 ```
 
 ![](PA1_template_files/figure-html/average_plot-1.png) 
 
-```r
-#maximum steps averaged over days(of interval)
-dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)),by=.(date,interval)][,max(average)]
-```
 
-```
-## [1] 806
-```
+__Maximum steps averaged over days(of interval)__
+
 
 ```r
-#the date of maximum amount of steps
-dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)),by=.(date,interval)][max(average),date]
+dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)),by=.(interval)][,max(average)]
 ```
 
 ```
-## [1] "2012-10-04"
+## [1] 206.1698
+```
+
+
+__The interval of maximum amount of steps__
+
+
+```r
+dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)),by=.(interval)][max(average),interval]
+```
+
+```
+## [1] 1705
 ```
 
 
 ## Imputing missing values
 
+###Reporting missing values per steps,date and interval 
+
+
+```r
+#missing values for steps
+dt[is.na(steps)==TRUE,.N]
+```
+
 ```
 ## [1] 2304
 ```
 
-```
-## [1] 0
+```r
+#missing values for date
+dt[is.na(date)==TRUE,.N]
 ```
 
 ```
 ## [1] 0
 ```
+
+```r
+#missing values for interval
+dt[is.na(interval)==TRUE,.N]
+```
+
+```
+## [1] 0
+```
+
 Total of 2304 missing values.
+
+Missing values are imputed with the mean of the series.
 
 
 ```r
 #create a new dataset
 #impute mean steps by mean of day
 dt_impute <- dt
-dt_impute[is.na(steps)==TRUE,steps:=mean(dt$steps, na.rm = TRUE)]
+mean_steps <- mean(dt$steps, na.rm = TRUE)
+dt_impute[is.na(steps)==TRUE,steps:=mean_steps]
 ```
+
+__Histogram for the imputed series__
 
 
 ```r
-ggplot(data=dt_impute[is.na(steps)==FALSE,.(sum_of_steps=sum(steps, na.rm = TRUE)), by=date], aes(sum_of_steps)) + geom_histogram() +xlab("Number of steps") +ylab("Frequency of days") +ggtitle("Histogram of sum of steps by day")
+ggplot(data=dt_impute[is.na(steps)==FALSE,.(sum_of_steps=sum(steps, na.rm = TRUE)), by=date], aes(sum_of_steps)) + geom_histogram() +xlab("Number of steps") +ylab("Frequency of days") +ggtitle("Histogram of sum of steps by day, imputed dataset")
 ```
 
 ```
-## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 ```
 
 ![](PA1_template_files/figure-html/new_hist-1.png) 
 
+__Comparison between original and imputed datasets - Mean and median steps for total steps per day__
+
+
+```r
+#calculation of mean of steps for total sum of steps per day
+dt_impute[,.(sum_steps=sum(steps, na.rm = TRUE)), by=date][,.(steps_mean=mean(sum_steps, na.rm = TRUE))]
+```
+
+```
+##    steps_mean
+## 1:   10766.19
+```
+
+```r
+#calculation of median of steps per day
+dt_impute[,.(sum_steps=sum(steps, na.rm = TRUE)), by=date][,.(steps_median=median(sum_steps, na.rm = TRUE))]
+```
+
+```
+##    steps_median
+## 1:     10766.19
+```
+
+The values of mean and median for the imputed series differ from the original series. The median and mean are the same after imputation.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-OMITTED
+
+```r
+#lets use the data.table function for weekdays 
+#calculate what day of the week the obs is
+dt_impute[,weekday:=as.POSIXlt(date)$wday +1L]
+#check
+dt_impute
+```
+
+```
+##          steps       date interval weekday
+##     1: 37.3826 2012-10-01        0       2
+##     2: 37.3826 2012-10-01        5       2
+##     3: 37.3826 2012-10-01       10       2
+##     4: 37.3826 2012-10-01       15       2
+##     5: 37.3826 2012-10-01       20       2
+##    ---                                    
+## 17564: 37.3826 2012-11-30     2335       6
+## 17565: 37.3826 2012-11-30     2340       6
+## 17566: 37.3826 2012-11-30     2345       6
+## 17567: 37.3826 2012-11-30     2350       6
+## 17568: 37.3826 2012-11-30     2355       6
+```
+
+```r
+#turn as a factor variable
+dt_impute[weekday <6, weekend:="weekday"]
+dt_impute[weekday >5, weekend:="weekend"]
+dt_impute[,weekend:=as.factor(weekend)]
+```
+
+
+```r
+#the plot requested
+ggplot(data=dt_impute[,.(average=mean(steps, na.rm = TRUE)), by=.(interval,weekend)],aes(x=interval,y=average)) + geom_line() +ggtitle("Average daily pattern") + facet_grid(weekend~.)
+```
+
+![](PA1_template_files/figure-html/weekend_plot-1.png) 
+
+```r
+#a better plot for comparing differences
+ggplot() + geom_line(data=dt_impute[,.(average=mean(steps, na.rm = TRUE)), by=.(interval,weekend)],aes(x=interval,y=average, color=weekend)) +ggtitle("Average daily pattern")
+```
+
+![](PA1_template_files/figure-html/weekend_plot-2.png) 
+

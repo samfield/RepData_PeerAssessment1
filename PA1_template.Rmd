@@ -18,12 +18,14 @@ I will use some basic packages for plotting and data handling, the following loa
 require(data.table)
 require(dplyr)
 require(ggplot2)
+require(lattice)
 ```
 
 It is assumed that the working directory of the user contains the same package of data as in the original repository, namely the activity.zip.
 
 First we will load the data. By using the unzip command
-```{r unzip,}
+
+```{r unzip,echo=TRUE}
 #directories;
 #define the where the zip file is downloaded
 temp <- paste(getwd(), "activity.zip", sep = "/")
@@ -37,36 +39,62 @@ dt[,steps:=as.numeric(steps)]
 summary(dt)
 ```
 
-
-
 ## What is mean total number of steps taken per day?
 
-```{r question_1, echo=FALSE}
-#calculation of mean of steps per day, removing na values, but reporting whole days with no values
-dt[,.(mean_steps=mean(steps, na.rm = TRUE)), by=date]
-#calculation of mean of steps per day, removing na values, but reporting whole days with no values
-dt[,.(median_steps=median(steps, na.rm = TRUE)), by=date]
+__Sum of steps per day__
+
+```{r total_nbr_of_steps_per_day, echo=TRUE}
+#calculation of sum of steps per day, removing na values, but reporting whole days with no values
+dt[,.(sum_steps=sum(steps, na.rm = TRUE)), by=date]
+```
+
+__Total number of steps daily__
+
+```{r histogram_daily, echo=TRUE}
 #plotting total number of steps daily
 #the data is a steps by dates
 ggplot(data=dt[is.na(steps)==FALSE,.(sum_of_steps=sum(steps, na.rm = TRUE)), by=date], aes(sum_of_steps)) + geom_histogram() +xlab("Number of steps") +ylab("Frequency of days") +ggtitle("Histogram of sum of steps by day")
 ```
 
+__Mean and median steps for total steps per day__
+
+```{r mean_and_median_steps_per_day, echo=TRUE}
+#calculation of mean of steps for total sum of steps per day
+dt[,.(sum_steps=sum(steps, na.rm = TRUE)), by=date][,.(steps_mean=mean(sum_steps, na.rm = TRUE))]
+#calculation of median of steps per day
+dt[,.(sum_steps=sum(steps, na.rm = TRUE)), by=date][,.(steps_median=median(sum_steps, na.rm = TRUE))]
+```
 
 
 ## What is the average daily activity pattern?
 
+__Time series of average daily activity__
+
 ```{r average_plot, echo=TRUE}
 #make the plot of average daily activity
-ggplot(data=dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)), by=.(date,interval)],aes(x=interval,y=average)) + geom_line() +ggtitle("Average daily pattern")
-#maximum steps averaged over days(of interval)
-dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)),by=.(date,interval)][,max(average)]
-#the date of maximum amount of steps
-dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)),by=.(date,interval)][max(average),date]
+ggplot(data=dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)), by=.(interval)],aes(x=interval,y=average)) + geom_line() +ggtitle("Average daily pattern")
+```
+
+
+__Maximum steps averaged over days(of interval)__
+
+```{r max_steps, echo=TRUE}
+dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)),by=.(interval)][,max(average)]
+```
+
+
+__The interval of maximum amount of steps__
+
+```{r most_steps,echo=TRUE}
+dt[is.na(steps)==FALSE,.(average=mean(steps, na.rm = TRUE)),by=.(interval)][max(average),interval]
 ```
 
 
 ## Imputing missing values
-```{r totat_amount_na, echo=FALSE}
+
+###Reporting missing values per steps,date and interval 
+
+```{r totat_amount_na, echo=TRUE}
 #missing values for steps
 dt[is.na(steps)==TRUE,.N]
 #missing values for date
@@ -74,20 +102,54 @@ dt[is.na(date)==TRUE,.N]
 #missing values for interval
 dt[is.na(interval)==TRUE,.N]
 ```
+
 Total of `r dt[is.na(steps)==TRUE,.N]` missing values.
 
-```{r impute_mean,}
+Missing values are imputed with the mean of the series.
+
+```{r impute_mean,echo=TRUE}
 #create a new dataset
 #impute mean steps by mean of day
 dt_impute <- dt
-dt_impute[is.na(steps)==TRUE,steps:=mean(dt$steps, na.rm = TRUE)]
+mean_steps <- mean(dt$steps, na.rm = TRUE)
+dt_impute[is.na(steps)==TRUE,steps:=mean_steps]
 ```
+
+__Histogram for the imputed series__
 
 ```{r new_hist,echo=TRUE}
-ggplot(data=dt_impute[is.na(steps)==FALSE,.(sum_of_steps=sum(steps, na.rm = TRUE)), by=date], aes(sum_of_steps)) + geom_histogram() +xlab("Number of steps") +ylab("Frequency of days") +ggtitle("Histogram of sum of steps by day")
+ggplot(data=dt_impute[is.na(steps)==FALSE,.(sum_of_steps=sum(steps, na.rm = TRUE)), by=date], aes(sum_of_steps)) + geom_histogram() +xlab("Number of steps") +ylab("Frequency of days") +ggtitle("Histogram of sum of steps by day, imputed dataset")
 ```
 
+__Comparison between original and imputed datasets - Mean and median steps for total steps per day__
+
+```{r mean_and_median_steps_per_day_imputed, echo=TRUE}
+#calculation of mean of steps for total sum of steps per day
+dt_impute[,.(sum_steps=sum(steps, na.rm = TRUE)), by=date][,.(steps_mean=mean(sum_steps, na.rm = TRUE))]
+#calculation of median of steps per day
+dt_impute[,.(sum_steps=sum(steps, na.rm = TRUE)), by=date][,.(steps_median=median(sum_steps, na.rm = TRUE))]
+```
+
+The values of mean and median for the imputed series differ from the original series. The median and mean are the same after imputation.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-OMITTED
+```{r calc_date, echo=TRUE}
+#lets use the data.table function for weekdays 
+#calculate what day of the week the obs is
+dt_impute[,weekday:=as.POSIXlt(date)$wday +1L]
+#check
+dt_impute
+#turn as a factor variable
+dt_impute[weekday <6, weekend:="weekday"]
+dt_impute[weekday >5, weekend:="weekend"]
+dt_impute[,weekend:=as.factor(weekend)]
+```
+
+```{r weekend_plot, echo=TRUE, fig.width=11}
+#the plot requested
+ggplot(data=dt_impute[,.(average=mean(steps, na.rm = TRUE)), by=.(interval,weekend)],aes(x=interval,y=average)) + geom_line() +ggtitle("Average daily pattern") + facet_grid(weekend~.)
+#a better plot for comparing differences
+ggplot() + geom_line(data=dt_impute[,.(average=mean(steps, na.rm = TRUE)), by=.(interval,weekend)],aes(x=interval,y=average, color=weekend)) +ggtitle("Average daily pattern")
+```
+
